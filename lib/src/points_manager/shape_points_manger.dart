@@ -4,6 +4,7 @@ class ShapePointsManger {
   static const arabicBase = '$base/arabic_phontics';
  static const englishUpperBase = '$base/english_upper_phonetics';
      static const mathShapeBase = '$base/math_shapes';
+     static const teluguBase = '$base/telugu_phontics';
 
          static const nLowerShape = '$englishBase/n_lower_PointsInfo.json';
     static const nUpperShape = '$englishBase/N_PointsInfo.json';
@@ -199,5 +200,8 @@ class ShapePointsManger {
         static const triangle2Shape = '$mathShapeBase/triangle2_PointsInfo.json';
         static const triangle3Shape = '$mathShapeBase/triangle3_PointsInfo.json';
         static const triangle4Shape = '$mathShapeBase/triangle4_PointsInfo.json';
+
+// Telugu
+    static const teluguAShape = '$teluguBase/a_PointsInfo.json';
 
 }

@@ -6,6 +6,7 @@ import 'package:tracing_game/src/phontics_constants/english_shape_path2.dart';
 import 'package:tracing_game/src/phontics_constants/math_trace_shape_paths.dart';
 import 'package:tracing_game/src/phontics_constants/numbers_svg.dart';
 import 'package:tracing_game/src/phontics_constants/shape_paths.dart';
+import 'package:tracing_game/src/phontics_constants/telugu_shape_paths.dart';
 import 'package:tracing_game/src/points_manager/shape_points_manger.dart';
 import 'package:tracing_game/src/tracing/model/trace_model.dart';
 import 'package:tracing_game/tracing_game.dart';
@@ -133,6 +134,14 @@ class TypeExtensionTracking {
     }
   }
 
+  TeluguLetters _detectTheCurrentEnumFromTelugu({required String letter}) {
+    if (letter == 'అ') {
+      return TeluguLetters.a;
+    } else {
+      throw Exception('Unsupported Telugu character type for tracing.');
+    }
+  }
+
   List<TraceModel> getTracingData({
     List<TraceCharModel>? chars,
     TraceWordModel? word,
@@ -193,6 +202,14 @@ class TypeExtensionTracking {
             indexColor: char.traceShapeOptions.indexColor,
             dottedColor: char.traceShapeOptions.dottedColor,
           ));
+        } else if (_isTeluguCharacter(letters)) {
+          tracingDataList
+              .addAll(_getTracingDataTelugu(letter: letters).map((e)=>e.copyWith(
+                    innerPaintColor: char.traceShapeOptions.innerPaintColor,
+                    outerPaintColor: char.traceShapeOptions.outerPaintColor,
+                    indexColor: char.traceShapeOptions.indexColor,
+                    dottedColor: char.traceShapeOptions.dottedColor,
+                  )));
         } else {
           throw Exception('Unsupported character type for tracing.');
         }
@@ -224,6 +241,11 @@ class TypeExtensionTracking {
   bool _isUpperCasePhonicsCharacter(String letter) {
     // Check if the letter is an uppercase phonics character
     return RegExp(r'^[A-Z]$').hasMatch(letter);
+  }
+
+  bool _isTeluguCharacter(String letter) {
+    // Check if the letter is a Telugu character (Unicode range: 0C00-0C7F)
+    return RegExp(r'[\u0C00-\u0C7F]').hasMatch(letter);
   }
 
   List<TraceModel> _getTracingDataNumbers({required String number}) {
@@ -2470,6 +2492,32 @@ class TypeExtensionTracking {
               scaledottedPath: .92,
               letterPath: EnglishShapePaths2.pBigShape,
               pointsJsonFile: ShapePointsManger.pUpperShape,
+              innerPaintColor: AppColorPhonetics.lightBlueColor5,
+              outerPaintColor: AppColorPhonetics.lightBlueColor5),
+        ];
+    }
+  }
+
+  List<TraceModel> _getTracingDataTelugu({required String letter}) {
+    TeluguLetters currentLetter = _detectTheCurrentEnumFromTelugu(letter: letter);
+
+    switch (currentLetter) {
+      case TeluguLetters.a:
+        return [
+          TraceModel(
+              positionIndexPath: const Size(0, 0),
+              positionDottedPath: const Size(0, 0),
+              scaledottedPath: 1.0,
+              scaleIndexPath: 1.0,
+              indexPathPaintStyle: PaintingStyle.stroke,
+              dottedPath: TeluguShapePaths.aDotted,
+              dottedColor: AppColorPhonetics.white,
+              indexColor: AppColorPhonetics.grey,
+              indexPath: TeluguShapePaths.aIndex,
+              letterPath: TeluguShapePaths.aShape,
+              strokeWidth: 40,
+              strokeIndex: 1,
+              pointsJsonFile: ShapePointsManger.teluguAShape,
               innerPaintColor: AppColorPhonetics.lightBlueColor5,
               outerPaintColor: AppColorPhonetics.lightBlueColor5),
         ];

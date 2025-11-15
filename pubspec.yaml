@@ -172,6 +172,8 @@ flutter:
     - packages/tracing_game/assets/phontics_assets_points/numbers_phontics/8_PointsInfo.json
     - packages/tracing_game/assets/phontics_assets_points/numbers_phontics/9_PointsInfo.json
     - packages/tracing_game/assets/phontics_assets_points/numbers_phontics/10_PointsInfo.json
+# // telugu
+    - packages/tracing_game/assets/phontics_assets_points/telugu_phontics/a_PointsInfo.json
 
     #     - packages/tracing_game/assets/phontics_assets_points/math_shapes/
 

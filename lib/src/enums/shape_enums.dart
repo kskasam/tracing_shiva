@@ -77,6 +77,10 @@ enum PhonicsLetters {
   z,
 }
 
+enum TeluguLetters {
+  a, // అ
+}
+
 enum StateOfTracing {
   chars,
   traceWords,
