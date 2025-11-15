@@ -203,5 +203,6 @@ class ShapePointsManger {
 
 // Telugu
     static const teluguAShape = '$teluguBase/a_PointsInfo.json';
+    static const teluguAAShape = '$teluguBase/aa_PointsInfo.json';
 
 }

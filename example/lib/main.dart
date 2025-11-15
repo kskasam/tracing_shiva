@@ -39,6 +39,15 @@ class _MyAppState extends State<MyApp> {
                     dottedColor: Colors.amber,
                   ),
                 ),
+                TraceCharModel(
+                  char: 'ఆ', // Telugu letter 'aa'
+                  traceShapeOptions: const TraceShapeOptions(
+                    innerPaintColor: Colors.blue,
+                    outerPaintColor: Colors.red,
+                    indexColor: Colors.grey,
+                    dottedColor: Colors.amber,
+                  ),
+                ),
               ])
             ],
             onTracingUpdated: (int currentTracingIndex) async {

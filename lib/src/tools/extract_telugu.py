@@ -50,10 +50,10 @@ def find_local_telugu_font():
     return None
 
 DEFAULT_FONT_URL = "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansTelugu/hinted/ttf/NotoSansTelugu-Regular.ttf"
-OUT_SVG = "a_extracted.svg"
-CODEPOINT = 0x0C05  # U+0C05 = అ
+OUT_SVG = "aa_extracted.svg"
+CODEPOINT = 0x0C06  # U+0C06 = ఆ (aa - second Telugu letter)
 # Alternative codepoints to try if main one fails
-ALTERNATIVE_CODEPOINTS = [0x0C05, 0x0C06, 0x0C07]  # Different potential mappings for అ
+ALTERNATIVE_CODEPOINTS = [0x0C06, 0x0C05, 0x0C07]  # Different potential mappings for ఆ
 
 
 def read_local_file(path):

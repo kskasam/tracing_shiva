@@ -137,6 +137,8 @@ class TypeExtensionTracking {
   TeluguLetters _detectTheCurrentEnumFromTelugu({required String letter}) {
     if (letter == 'అ') {
       return TeluguLetters.a;
+    } else if (letter == 'ఆ') {
+      return TeluguLetters.aa;
     } else {
       throw Exception('Unsupported Telugu character type for tracing.');
     }
@@ -2518,6 +2520,26 @@ class TypeExtensionTracking {
               strokeWidth: 40,
               strokeIndex: 1,
               pointsJsonFile: ShapePointsManger.teluguAShape,
+              letterViewSize: const Size(300, 300),
+              innerPaintColor: AppColorPhonetics.lightBlueColor5,
+              outerPaintColor: AppColorPhonetics.lightBlueColor5),
+        ];
+      case TeluguLetters.aa:
+        return [
+          TraceModel(
+              positionIndexPath: const Size(0, 0),
+              positionDottedPath: const Size(0, 0),
+              scaledottedPath: 1.0,
+              scaleIndexPath: 1.0,
+              indexPathPaintStyle: PaintingStyle.stroke,
+              dottedPath: TeluguShapePaths.aaDotted,
+              dottedColor: AppColorPhonetics.white,
+              indexColor: AppColorPhonetics.grey,
+              indexPath: TeluguShapePaths.aaIndex,
+              letterPath: TeluguShapePaths.aaShape,
+              strokeWidth: 40,
+              strokeIndex: 1,
+              pointsJsonFile: ShapePointsManger.teluguAAShape,
               letterViewSize: const Size(300, 300),
               innerPaintColor: AppColorPhonetics.lightBlueColor5,
               outerPaintColor: AppColorPhonetics.lightBlueColor5),
