@@ -33,17 +33,17 @@ class _MyAppState extends State<MyApp> {
                 TraceCharModel(
                   char: 'అ', // Telugu letter 'a'
                   traceShapeOptions: const TraceShapeOptions(
-                    innerPaintColor: Colors.blue,
-                    outerPaintColor: Colors.red,
+                    innerPaintColor: Colors.red, // Tracing stroke color (what you draw)
+                    outerPaintColor: Colors.blue, // Letter fill color (background)
                     indexColor: Colors.grey,
                     dottedColor: Colors.amber,
                   ),
                 ),
                 TraceCharModel(
-                  char: 'ఆ', // Telugu letter 'aa'
+                  char: 'A', // Telugu letter 'aa'
                   traceShapeOptions: const TraceShapeOptions(
-                    innerPaintColor: Colors.blue,
-                    outerPaintColor: Colors.red,
+                    innerPaintColor: Colors.red, // Tracing stroke color (what you draw)
+                    outerPaintColor: Colors.blue, // Letter fill color (background)
                     indexColor: Colors.grey,
                     dottedColor: Colors.amber,
                   ),

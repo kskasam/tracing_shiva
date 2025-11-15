@@ -2513,7 +2513,7 @@ class TypeExtensionTracking {
               scaleIndexPath: 1.0,
               indexPathPaintStyle: PaintingStyle.stroke,
               dottedPath: TeluguShapePaths.aDotted,
-              dottedColor: AppColorPhonetics.white,
+              dottedColor: AppColorPhonetics.grey,
               indexColor: AppColorPhonetics.grey,
               indexPath: TeluguShapePaths.aIndex,
               letterPath: TeluguShapePaths.aShape,

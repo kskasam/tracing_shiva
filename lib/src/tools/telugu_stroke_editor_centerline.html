@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telugu Stroke Editor - Centerline Tracing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h2 {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button.success {
+            background: #4CAF50;
+        }
+        
+        button.danger {
+            background: #f44336;
+        }
+        
+        .canvas-container {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #canvas {
+            border: 1px solid #ccc;
+            background: #fafafa;
+            cursor: crosshair;
+        }
+        
+        .letter-path {
+            fill: lightblue;
+            stroke: #0066cc;
+            stroke-width: 3;
+            opacity: 0.6;
+        }
+        
+        .point-marker {
+            fill: #f44336;
+            stroke: white;
+            stroke-width: 2;
+        }
+        
+        .centerline-point {
+            fill: #4CAF50;
+            stroke: white;
+            stroke-width: 2;
+        }
+        
+        .stroke-line {
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .stroke-1 { stroke: #f44336; }
+        .stroke-2 { stroke: #2196F3; }
+        .stroke-3 { stroke: #4CAF50; }
+        .stroke-4 { stroke: #ff9800; }
+        .stroke-5 { stroke: #9c27b0; }
+        
+        #output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #ddd;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Telugu Stroke Editor - Centerline Tracing</h1>
+        
+        <div class="info-box">
+            <h2>✨ Centerline Mode</h2>
+            <p><strong>Key Feature:</strong> Click anywhere on the letter, and the tool will automatically find the centerline point inside the stroke borders.</p>
+            <p><strong>How it works:</strong> When you click, it finds the closest edge point, then moves inward toward the center of the letter shape to get the centerline position.</p>
+            <p><strong>Coordinate System:</strong> Uses Flutter's exact transformation (viewSize 300x300). JSON points are normalized (0.0-1.0) and will align perfectly with the SVG path in Flutter.</p>
+            <p><strong>⚠️ Important:</strong> Make sure to paste the EXACT SVG path from <code>telugu_shape_paths.dart</code> (the <code>aShape</code> constant). The tool uses Flutter's exact transformation, so the generated JSON will align perfectly in the app.</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 How to Use:</h3>
+            <ol>
+                <li>Paste your Telugu letter's SVG path below</li>
+                <li>Adjust the "Centerline Offset" slider (how far inward from the edge)</li>
+                <li>Click "Load SVG and Start Tracing"</li>
+                <li>Click anywhere on the letter - points will be placed on the centerline</li>
+                <li>Press "Finish Stroke" to start a new stroke</li>
+                <li>Copy the generated JSON and save to your PointsInfo.json file</li>
+            </ol>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="svgInput">Telugu Letter SVG Path:</label>
+                <textarea id="svgInput" placeholder="Paste SVG path here, e.g., M 390 1012 Q 270 1012..."></textarea>
+                <button onclick="loadSVG()">Load SVG and Start Tracing</button>
+            </div>
+            
+            <div class="control-group">
+                <label>View Size (matches Flutter):</label>
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                    <input type="number" id="viewWidth" value="300" style="width: 80px; padding: 8px;">
+                    <span>x</span>
+                    <input type="number" id="viewHeight" value="300" style="width: 80px; padding: 8px;">
+                </div>
+                
+                <label>Centerline Offset (how far inward from edge):</label>
+                <div class="slider-container">
+                    <input type="range" id="centerlineOffset" min="5" max="50" value="20" oninput="updateOffsetValue()">
+                    <span class="slider-value" id="offsetValue">20</span>
+                    <span>px</span>
+                </div>
+                <small style="color: #666;">Adjust this to place points more toward the center of strokes</small>
+                
+                <button onclick="finishStroke()" class="success" style="margin-top: 20px;">✓ Finish Current Stroke</button>
+                <button onclick="reset()" class="danger">↻ Reset All</button>
+            </div>
+        </div>
+        
+        <div id="status" class="status info">
+            Waiting for SVG input...
+        </div>
+        
+        <div class="canvas-container">
+            <svg id="canvas" width="600" height="600"></svg>
+        </div>
+        
+        <h3>Generated JSON:</h3>
+        <pre id="output">Trace your letter to see the JSON output here...</pre>
+        
+        <h3 style="margin-top: 30px;">📊 Validation Preview:</h3>
+        <p style="text-align: center; color: #666;">
+            <strong>Blue</strong> = Original SVG Path | <strong>Green</strong> = Your Centerline Points | <strong>Red</strong> = Edge Points (for reference)
+        </p>
+        <div class="canvas-container">
+            <svg id="validationCanvas" width="600" height="600"></svg>
+        </div>
+    </div>
+
+    <script>
+        let svgPathData = '';
+        let strokes = [];
+        let currentStroke = [];
+        let pathElement = null;
+        let svgBBox = null;
+        let viewSize = { width: 300, height: 300 };
+        let flutterTransform = null;
+        let centerlineOffset = 20; // pixels inward from edge
+        
+        function updateOffsetValue() {
+            centerlineOffset = parseFloat(document.getElementById('centerlineOffset').value);
+            document.getElementById('offsetValue').textContent = centerlineOffset;
+        }
+        
+        function loadSVG() {
+            const input = document.getElementById('svgInput').value.trim();
+            if (!input) {
+                alert('Please paste an SVG path first!');
+                return;
+            }
+            
+            viewSize.width = parseFloat(document.getElementById('viewWidth').value) || 300;
+            viewSize.height = parseFloat(document.getElementById('viewHeight').value) || 300;
+            centerlineOffset = parseFloat(document.getElementById('centerlineOffset').value) || 20;
+            
+            svgPathData = input.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+            
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '';
+            
+            pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathElement.setAttribute('d', svgPathData);
+            pathElement.setAttribute('class', 'letter-path');
+            canvas.appendChild(pathElement);
+            
+            setTimeout(() => {
+                try {
+                    svgBBox = pathElement.getBBox();
+                    console.log('SVG BBox:', svgBBox);
+                    
+                    if (svgBBox.width > 0 && svgBBox.height > 0) {
+                        calculateFlutterTransform();
+                        
+                        const padding = 50;
+                        canvas.setAttribute('viewBox', 
+                            `${svgBBox.x - padding} ${svgBBox.y - padding} ${svgBBox.width + 2*padding} ${svgBBox.height + 2*padding}`);
+                        canvas.setAttribute('width', '100%');
+                        canvas.setAttribute('height', '600');
+                        canvas.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                        
+                        canvas.addEventListener('click', onCanvasClick);
+                        
+                        updateStatus('SVG loaded! Click on the letter to trace centerline points.', 'success');
+                    } else {
+                        updateStatus('Error: Invalid SVG bounding box', 'info');
+                    }
+                } catch (error) {
+                    console.error('Error loading SVG:', error);
+                    updateStatus('Error loading SVG: ' + error.message, 'info');
+                }
+            }, 100);
+        }
+        
+        function calculateFlutterTransform() {
+            const originalWidth = svgBBox.width;
+            const originalHeight = svgBBox.height;
+            
+            const scaleX = viewSize.width / originalWidth;
+            const scaleY = viewSize.height / originalHeight;
+            const scale = Math.min(scaleX, scaleY);
+            
+            const translateX = (viewSize.width - originalWidth * scale) / 2 - svgBBox.x * scale;
+            const translateY = (viewSize.height - originalHeight * scale) / 2 - svgBBox.y * scale;
+            
+            flutterTransform = {
+                scale: scale,
+                translateX: translateX,
+                translateY: translateY,
+                originalLeft: svgBBox.x,
+                originalTop: svgBBox.y
+            };
+            
+            console.log('Flutter Transform:', flutterTransform);
+        }
+        
+        function svgToFlutterNormalized(svgX, svgY) {
+            const flutterX = svgX * flutterTransform.scale + flutterTransform.translateX;
+            const flutterY = svgY * flutterTransform.scale + flutterTransform.translateY;
+            
+            const normalizedX = flutterX / viewSize.width;
+            const normalizedY = flutterY / viewSize.height;
+            
+            return {
+                x: Math.max(0, Math.min(1, normalizedX)),
+                y: Math.max(0, Math.min(1, normalizedY))
+            };
+        }
+        
+        function findCenterlinePoint(clickX, clickY) {
+            // Step 1: Find closest point on path edge
+            const pathLength = pathElement.getTotalLength();
+            let minDistance = Infinity;
+            let closestLength = 0;
+            let closestPoint = null;
+            
+            const sampleStep = Math.max(1, pathLength / 1000);
+            
+            for (let length = 0; length <= pathLength; length += sampleStep) {
+                const pt = pathElement.getPointAtLength(length);
+                const distance = Math.sqrt(
+                    Math.pow(pt.x - clickX, 2) + Math.pow(pt.y - clickY, 2)
+                );
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestLength = length;
+                    closestPoint = { x: pt.x, y: pt.y };
+                }
+            }
+            
+            // Step 2: Calculate tangent (direction of path at this point)
+            const tangentLength = 10; // small distance for tangent calculation
+            const beforeLength = Math.max(0, closestLength - tangentLength);
+            const afterLength = Math.min(pathLength, closestLength + tangentLength);
+            
+            const beforePoint = pathElement.getPointAtLength(beforeLength);
+            const afterPoint = pathElement.getPointAtLength(afterLength);
+            
+            // Tangent vector (direction along the path)
+            const tangentX = afterPoint.x - beforePoint.x;
+            const tangentY = afterPoint.y - beforePoint.y;
+            const tangentLength_mag = Math.sqrt(tangentX * tangentX + tangentY * tangentY);
+            
+            if (tangentLength_mag < 0.001) {
+                // Can't determine direction, return edge point
+                return closestPoint;
+            }
+            
+            // Normalize tangent
+            const normTangentX = tangentX / tangentLength_mag;
+            const normTangentY = tangentY / tangentLength_mag;
+            
+            // Step 3: Calculate normal (perpendicular, pointing inward)
+            // Normal is perpendicular to tangent: rotate 90 degrees
+            const normalX = -normTangentY;  // Perpendicular to tangent
+            const normalY = normTangentX;
+            
+            // Step 4: Determine which direction is "inward" (toward center of shape)
+            // Test both directions and pick the one that's inside the shape
+            const testOffset1 = centerlineOffset;
+            const testOffset2 = -centerlineOffset;
+            
+            const testPoint1 = {
+                x: closestPoint.x + normalX * testOffset1,
+                y: closestPoint.y + normalY * testOffset1
+            };
+            
+            const testPoint2 = {
+                x: closestPoint.x + normalX * testOffset2,
+                y: closestPoint.y + normalY * testOffset2
+            };
+            
+            // Check which point is inside the shape
+            const isInside1 = isPointInPath(testPoint1.x, testPoint1.y);
+            const isInside2 = isPointInPath(testPoint2.x, testPoint2.y);
+            
+            let centerlinePoint;
+            if (isInside1 && !isInside2) {
+                // Direction 1 is inward
+                centerlinePoint = testPoint1;
+            } else if (isInside2 && !isInside1) {
+                // Direction 2 is inward
+                centerlinePoint = testPoint2;
+            } else {
+                // Both or neither inside - use the direction toward click point
+                const toClickX = clickX - closestPoint.x;
+                const toClickY = clickY - closestPoint.y;
+                const dotProduct = normalX * toClickX + normalY * toClickY;
+                
+                if (dotProduct > 0) {
+                    centerlinePoint = testPoint1;
+                } else {
+                    centerlinePoint = testPoint2;
+                }
+            }
+            
+            return {
+                edgePoint: closestPoint,
+                centerlinePoint: centerlinePoint
+            };
+        }
+        
+        function isPointInPath(x, y) {
+            // Create a temporary SVG point and check if it's inside the path
+            const canvas = document.getElementById('canvas');
+            const pt = canvas.createSVGPoint();
+            pt.x = x;
+            pt.y = y;
+            
+            // Check if point is inside using SVG's isPointInFill
+            return pathElement.isPointInFill(pt);
+        }
+        
+        function onCanvasClick(event) {
+            if (!pathElement || !svgBBox || !flutterTransform) return;
+            
+            const canvas = document.getElementById('canvas');
+            
+            // Convert screen coordinates to SVG coordinates
+            const pt = canvas.createSVGPoint();
+            pt.x = event.clientX;
+            pt.y = event.clientY;
+            const svgPoint = pt.matrixTransform(canvas.getScreenCTM().inverse());
+            
+            console.log('Click at SVG:', svgPoint.x, svgPoint.y);
+            
+            // Find centerline point
+            const result = findCenterlinePoint(svgPoint.x, svgPoint.y);
+            const centerlinePoint = result.centerlinePoint;
+            const edgePoint = result.edgePoint;
+            
+            console.log('Edge point:', edgePoint.x, edgePoint.y);
+            console.log('Centerline point:', centerlinePoint.x, centerlinePoint.y);
+            
+            // Convert to normalized coordinates
+            const normalized = svgToFlutterNormalized(centerlinePoint.x, centerlinePoint.y);
+            
+            currentStroke.push({
+                index: currentStroke.length,
+                x: normalized.x,
+                y: normalized.y,
+                svgX: centerlinePoint.x,
+                svgY: centerlinePoint.y,
+                edgeX: edgePoint.x,
+                edgeY: edgePoint.y
+            });
+            
+            // Draw markers
+            drawPointMarker(edgePoint.x, edgePoint.y, centerlinePoint.x, centerlinePoint.y, currentStroke.length);
+            
+            // Update stroke line
+            updateStrokeLine();
+            
+            // Update output
+            updateOutput();
+            
+            updateStatus(`Point ${currentStroke.length} added to stroke ${strokes.length + 1} (centerline)`, 'success');
+        }
+        
+        function drawPointMarker(edgeX, edgeY, centerlineX, centerlineY, index) {
+            const canvas = document.getElementById('canvas');
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            
+            // Draw edge point (red, smaller)
+            const edgeCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            edgeCircle.setAttribute('cx', edgeX);
+            edgeCircle.setAttribute('cy', edgeY);
+            edgeCircle.setAttribute('r', 4);
+            edgeCircle.setAttribute('fill', '#ff0000');
+            edgeCircle.setAttribute('opacity', '0.5');
+            g.appendChild(edgeCircle);
+            
+            // Draw centerline point (green, larger)
+            const centerlineCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            centerlineCircle.setAttribute('cx', centerlineX);
+            centerlineCircle.setAttribute('cy', centerlineY);
+            centerlineCircle.setAttribute('r', 6);
+            centerlineCircle.setAttribute('class', 'centerline-point');
+            g.appendChild(centerlineCircle);
+            
+            // Draw line connecting edge to centerline
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', edgeX);
+            line.setAttribute('y1', edgeY);
+            line.setAttribute('x2', centerlineX);
+            line.setAttribute('y2', centerlineY);
+            line.setAttribute('stroke', '#999');
+            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-dasharray', '2,2');
+            line.setAttribute('opacity', '0.5');
+            g.appendChild(line);
+            
+            // Draw number
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', centerlineX);
+            text.setAttribute('y', centerlineY);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('font-size', '10');
+            text.setAttribute('fill', 'white');
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = index;
+            g.appendChild(text);
+            
+            canvas.appendChild(g);
+        }
+        
+        function updateStrokeLine() {
+            const canvas = document.getElementById('canvas');
+            const existingLine = canvas.querySelector('.current-stroke-line');
+            if (existingLine) existingLine.remove();
+            
+            if (currentStroke.length < 2) return;
+            
+            const pathData = currentStroke.map((pt, i) => 
+                `${i === 0 ? 'M' : 'L'} ${pt.svgX} ${pt.svgY}`
+            ).join(' ');
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            line.setAttribute('d', pathData);
+            line.setAttribute('class', `stroke-line stroke-${(strokes.length % 5) + 1} current-stroke-line`);
+            canvas.appendChild(line);
+        }
+        
+        function finishStroke() {
+            if (currentStroke.length === 0) {
+                alert('No points in current stroke!');
+                return;
+            }
+            
+            strokes.push([...currentStroke]);
+            currentStroke = [];
+            
+            updateOutput();
+            updateStatus(`Stroke ${strokes.length} finished! Click to start next stroke.`, 'success');
+        }
+        
+        function updateOutput() {
+            const json = {
+                strokes: strokes.concat(currentStroke.length > 0 ? [currentStroke] : []).map(stroke => ({
+                    points: stroke.map(pt => `${pt.x.toFixed(4)},${pt.y.toFixed(4)}`)
+                }))
+            };
+            
+            document.getElementById('output').textContent = JSON.stringify(json, null, 2);
+            
+            updateValidationCanvas(json);
+        }
+        
+        function updateValidationCanvas(json) {
+            const validationCanvas = document.getElementById('validationCanvas');
+            validationCanvas.innerHTML = '';
+            
+            if (!svgBBox || !svgPathData) return;
+            
+            const padding = 50;
+            validationCanvas.setAttribute('viewBox', 
+                `${svgBBox.x - padding} ${svgBBox.y - padding} ${svgBBox.width + 2*padding} ${svgBBox.height + 2*padding}`);
+            validationCanvas.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+            
+            // Draw original SVG path
+            const originalPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            originalPath.setAttribute('d', svgPathData);
+            originalPath.setAttribute('fill', 'lightblue');
+            originalPath.setAttribute('stroke', '#0066cc');
+            originalPath.setAttribute('stroke-width', '3');
+            originalPath.setAttribute('opacity', '0.5');
+            validationCanvas.appendChild(originalPath);
+            
+            // Draw JSON strokes
+            if (json.strokes && json.strokes.length > 0) {
+                json.strokes.forEach((stroke, strokeIdx) => {
+                    if (stroke.points && stroke.points.length > 0) {
+                        const svgPoints = stroke.points.map(pointStr => {
+                            const [normX, normY] = pointStr.split(',').map(parseFloat);
+                            const flutterX = normX * viewSize.width;
+                            const flutterY = normY * viewSize.height;
+                            const svgX = (flutterX - flutterTransform.translateX) / flutterTransform.scale;
+                            const svgY = (flutterY - flutterTransform.translateY) / flutterTransform.scale;
+                            return { x: svgX, y: svgY };
+                        });
+                        
+                        // Draw stroke line (green for centerline)
+                        const strokePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        const pathData = svgPoints.map((pt, i) => 
+                            `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`
+                        ).join(' ');
+                        strokePath.setAttribute('d', pathData);
+                        strokePath.setAttribute('stroke', '#4CAF50');
+                        strokePath.setAttribute('stroke-width', '5');
+                        strokePath.setAttribute('fill', 'none');
+                        strokePath.setAttribute('stroke-linecap', 'round');
+                        strokePath.setAttribute('stroke-linejoin', 'round');
+                        validationCanvas.appendChild(strokePath);
+                        
+                        // Draw points
+                        svgPoints.forEach((pt, idx) => {
+                            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                            circle.setAttribute('cx', pt.x);
+                            circle.setAttribute('cy', pt.y);
+                            circle.setAttribute('r', '8');
+                            circle.setAttribute('fill', '#4CAF50');
+                            circle.setAttribute('stroke', 'white');
+                            circle.setAttribute('stroke-width', '2');
+                            validationCanvas.appendChild(circle);
+                        });
+                    }
+                });
+            }
+        }
+        
+        function reset() {
+            strokes = [];
+            currentStroke = [];
+            const canvas = document.getElementById('canvas');
+            Array.from(canvas.children).forEach(child => {
+                if (child !== pathElement) child.remove();
+            });
+            updateOutput();
+            updateStatus('Reset complete. Start tracing!', 'info');
+        }
+        
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // Load default Telugu 'a' SVG path
+        document.getElementById('svgInput').value = `M 390 1012 Q 270 1012 191.5 974.5 Q 113 937 74.5 872 Q 36 807 36 727 Q 36 655 61 604 Q 86 553 128.5 526.5 Q 171 500 225 500 Q 285 500 321 534 Q 357 568 357 627 Q 357 688 319 726.5 Q 281 765 202 765 Q 177 765 155.5 758.5 Q 134 752 115 743 Q 119 792 148 835.5 Q 177 879 236 906 Q 295 933 390 933 Q 538 933 610 880.5 Q 682 828 682 715 Q 682 678 671 646.5 Q 660 615 637.5 595 Q 615 575 580 575 Q 557 575 537.5 590.5 Q 518 606 518 640 Q 518 679 544 704.5 Q 570 730 612 744 V 816 H 303 V 742 H 500 Q 439 704 439 626 Q 439 596 454 567 Q 469 538 501.5 519 Q 534 500 584 500 Q 636 500 676.5 528 Q 717 556 741 604.5 Q 765 653 765 716 Q 765 867 665.5 939.5 Q 566 1012 390 1012 Z M 220 571 Q 182 571 155 597 Q 128 623 119 671 Q 133 681 152.5 688 Q 172 695 197 695 Q 237 695 257.5 678 Q 278 661 278 631 Q 278 602 262 586.5 Q 246 571 220 571 Z`;
+    </script>
+</body>
+</html>
+
