@@ -2518,6 +2518,7 @@ class TypeExtensionTracking {
               strokeWidth: 40,
               strokeIndex: 1,
               pointsJsonFile: ShapePointsManger.teluguAShape,
+              letterViewSize: const Size(300, 300),
               innerPaintColor: AppColorPhonetics.lightBlueColor5,
               outerPaintColor: AppColorPhonetics.lightBlueColor5),
         ];

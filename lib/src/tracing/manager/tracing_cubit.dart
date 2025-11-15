@@ -68,7 +68,7 @@ class TracingCubit extends Cubit<TracingState> {
     await loadAssets();
   }
 
-  final viewSize = const Size(200, 200);
+  final viewSize = const Size(300, 300);
   Future<void> loadAssets() async {
     emit(state.copyWith(drawingStates: DrawingStates.loading));
 

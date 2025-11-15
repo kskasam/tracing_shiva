@@ -23,96 +23,34 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Tracing Game'),
+          title: const Text('Telugu Letter Tracing'),
         ),
-        body: Column(
-          // spacing: 3,
-          children: [
-            Expanded(
-              child: TracingCharsGame(
-                showAnchor: true,
-                traceShapeModel: [
-               TraceCharsModel(chars: [
-                    TraceCharModel(
-                        char: 'X',
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange)),
-                                   TraceCharModel(
-                        char: 'r',
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange)),
-                                               TraceCharModel(
-                        char: '2',
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange)),
-              
-                  ])
-                ],
-
-                onTracingUpdated: (int currentTracingIndex) async {
-                  print('/////onTracingUpdated:' +
-                      currentTracingIndex.toString());
-                },
-                onGameFinished: (int screenIndex) async {
-                  print('/////onGameFinished:' + screenIndex.toString());
-                },
-                onCurrentTracingScreenFinished: (int currentScreenIndex) async {
-                  print('/////onCurrentTracingScreenFinished:' +
-                      currentScreenIndex.toString());
-                },
-              ),
-            ),
-            Expanded(
-              child: TracingGeometricShapesGame(
-                traceGeoMetricShapeModels: [
-                  TraceGeoMetricShapeModel(shapes: [
-                    MathShapeWithOption(
-                        shape: MathShapes.circle,
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange)),
-                    MathShapeWithOption(
-                        shape: MathShapes.triangle1,
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange))
-                  ]),
-                  TraceGeoMetricShapeModel(shapes: [
-                    MathShapeWithOption(
-                        shape: MathShapes.triangle3,
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange)),
-                    MathShapeWithOption(
-                        shape: MathShapes.triangle2,
-                        traceShapeOptions: const TraceShapeOptions(
-                            innerPaintColor: Colors.orange))
-                  ]),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TracingWordGame(
-                words: [
-                  TraceWordModel(word: 'I Love',traceShapeOptions: const TraceShapeOptions(
-                    indexColor: Colors.green
-                  )),
-                   TraceWordModel(word: 'Trace',traceShapeOptions: const TraceShapeOptions(
-                    indexColor: Colors.green
-                  ))
-                ],
-                      onTracingUpdated: (int currentTracingIndex) async {
-                  print('/////onTracingUpdated:' +
-                      currentTracingIndex.toString());
-                },
-                onGameFinished: (int screenIndex) async {
-                  print('/////onGameFinished:' + screenIndex.toString());
-                },
-                onCurrentTracingScreenFinished: (int currentScreenIndex) async {
-                  print('/////onCurrentTracingScreenFinished:' +
-                      currentScreenIndex.toString());
-                },
-
-              ),
-            ),
-          ],
+        body: Center(
+          child: TracingCharsGame(
+            showAnchor: true,
+            traceShapeModel: [
+              TraceCharsModel(chars: [
+                TraceCharModel(
+                  char: 'అ', // Telugu letter 'a'
+                  traceShapeOptions: const TraceShapeOptions(
+                    innerPaintColor: Colors.blue,
+                    outerPaintColor: Colors.red,
+                    indexColor: Colors.grey,
+                    dottedColor: Colors.amber,
+                  ),
+                ),
+              ])
+            ],
+            onTracingUpdated: (int currentTracingIndex) async {
+              print('Tracing updated: $currentTracingIndex');
+            },
+            onGameFinished: (int screenIndex) async {
+              print('Game finished: $screenIndex');
+            },
+            onCurrentTracingScreenFinished: (int currentScreenIndex) async {
+              print('Current screen finished: $currentScreenIndex');
+            },
+          ),
         ),
       ),
     );
